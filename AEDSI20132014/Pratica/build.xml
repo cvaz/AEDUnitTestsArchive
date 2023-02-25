@@ -1,0 +1,78 @@
+<project name="progs" default="test" basedir=".">
+
+  <description>
+    Ant build file for AED
+  </description>
+
+  <!--++++++++++ Properties ++++++++++-->
+  <property name="src-main" location="main/java"/>
+  <property name="src-test" location="test/java"/>
+
+  <path id="main.extlibs.class.path">
+    <fileset dir="vendor/main/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+  
+  <path id="test.extlibs.class.path">
+    <path refid="main.extlibs.class.path" />
+    <fileset dir="vendor/test/lib">
+      <include name="**/*.jar" />
+    </fileset>
+  </path>
+
+  <!--++++++++++ Targets ++++++++++-->
+
+  
+
+
+  <target name="compile-main" depends="init"
+        description="Compiles the main source" >
+
+    <javac debug="true"
+           srcdir="${src-main}"
+           destdir="${src-main}"
+           includeantruntime="false">
+      <classpath>
+        <path refid="main.extlibs.class.path" />
+      </classpath>
+    </javac>
+  </target>
+
+
+  <target name="compile-test" depends="compile-main"
+        description="Compiles the test source" >
+    <javac  debug="true"
+            debugLevel="source"
+            srcdir="${src-test}"
+            destdir="${src-test}"
+            includeantruntime="true">
+      <classpath>
+        <path refid="test.extlibs.class.path" />
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="test" depends="compile-test" description="Runs the tests">
+    <junit printsummary="yes" haltonfailure="true" showoutput="true" >
+      <classpath>
+        <path refid="test.extlibs.class.path" />
+      </classpath>
+
+      <formatter type="plain"/>
+
+      <batchtest fork="yes" todir="${target-test-reports}" >
+        <fileset dir="${src-test}">
+          <include name="**/*Test*.java"/>
+        </fileset>
+        <formatter type="xml"/>
+        <formatter type="plain" usefile="false" />
+      </batchtest>
+    </junit>
+  </target>
+  
+  <target name="package" depends="test" description="Packages the main classes into a jar" >
+    <buildnumber />
+    <jar jarfile="${target}/library.jar" basedir="${target-classes}"/>
+  </target>
+</project>
